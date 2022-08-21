@@ -9,7 +9,11 @@
 #   edit sub-item
 
 from msilib.schema import File
+from queue import Empty
 
+from errors import EmptyStringError
+
+import sys
 
 def full_stack():
         import traceback, sys
@@ -30,6 +34,8 @@ try:
     from termcolor import colored
     import colorama as color
     color.init()
+
+    import os
 
     def splitByIndentation(data: str):
         indented = False
@@ -110,9 +116,39 @@ try:
                     for item in items:
                         if type(item) == list:
                             for item_ in item:
-                                savedFile += item
+                                savedFile += item_
+                                savedFile += '\n'
+                                
                         elif type(item) == str:
                             savedFile += item
+
+                        savedFile += '\n'
+                    
+                    # print('\n\n\n' + savedFile)
+
+                    trying = True
+                    while trying:
+                        filename = input("File path to save in: ")
+                        filename = filename.strip()
+                        try:
+                            if filename == '':
+                                raise EmptyStringError
+                            else:
+                                try:
+                                    with open(filename, 'w') as f:
+                                        end = input(color.Fore.YELLOW + f"{os.path.basename(filename)} already exists. Are you sure you want to overwrite it (y/n)? " + color.Fore.WHITE)
+                                        end = end.strip().lower()
+                                        if end == 'y' or end == 'yes':
+                                            f.write(savedFile)
+                                            trying = False
+                                except FileNotFoundError:
+                                    with open(filename, 'x') as f:
+                                        f.write(savedFile)
+                                        trying = False
+                        except EmptyStringError:
+                            print("You must enter a value.")
+
+                    quit()
 
                 # itemIndex = int(input("Enter a valid indeger of an item to edit: "))
                 print('Invalid item.')
@@ -125,9 +161,11 @@ except KeyboardInterrupt:
     end = input(color.Fore.RED + "Are you sure you want to quit (y/n)? " + color.Fore.WHITE)
     end = end.strip().lower()
     if end == 'y' or end == 'yes':
-        exit(0)
+        quit()
     # else:
     #     pass
+except SystemExit as e:
+    sys.exit(e)
 except BaseException as e:
     print(color.Fore.RED + f"FATAL ERROR DETECTED!\n Please report this error to https://github.com/newDan1/endless-sky-save-editor/issues:\n{full_stack()}")
-    exit()
+    quit()

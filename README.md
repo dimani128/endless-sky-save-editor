@@ -8,6 +8,9 @@ A WIP save editor for the videogame [Endless Sky](https://endless-sky.github.io/
 4. Run ```python3 main.py```
 
 ## Changelog
+#### v0.2.0 - 8/21/2022:
+ - Added patch number to version
+ - Added 'edit' command
 #### v0.1 - 8/21/2022:
  - Added ```help``` command
  - Added save fuctionality

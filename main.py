@@ -1,6 +1,7 @@
 
 
 # TODO
+# Add comments to explain code
 
 # BUG(s)
 # Some colored text is broken:
@@ -61,7 +62,8 @@ try:
         elif type(item) == str:
             print(colored(f"[{index}]", 'green'), item.replace('\\t', '\t').replace('"', ''))
 
-    with open('save.txt', 'r') as f:
+    filename = input("File path to save file (check in %appdata%/roaming/endless-sky/saves): ")
+    with open(filename, 'r') as f:
         items = splitByIndentation(f.read())
         printAvailableItems()
 
@@ -69,17 +71,20 @@ try:
         trying = True
         while trying:
             try:
-                itemIndex = int(input("Enter an item to edit: "))
+                itemIndex = input("Enter an item to edit ('save' to save and exit): ")
+                itemIndex = int(itemIndex)
                 trying = False
                 printSelectedItem(itemIndex)
 
                 itemToEdit = items[itemIndex]
 
                 subItemIndex = int(input("Enter a sub-item to edit: "))
+                
                 oldVal = itemToEdit[subItemIndex]
                 items[itemIndex][subItemIndex] = "\t" + input(colored(f'[{subItemIndex}]', 'green') + f'Previously: {oldVal.strip()}. Enter new value (leave blank to cancel): ').strip()
                 
             except (ValueError, IndexError):
+                
                 # itemIndex = int(input("Enter a valid indeger of an item to edit: "))
                 print('Invalid item.')
 

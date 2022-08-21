@@ -45,6 +45,7 @@ try:    # main try statement for handling:
 
     VERSION = "0.2.0"         # Version
     VERSION_CHANGELOG = '''
+        Added patch number to version
         Added command 'edit'
     '''                     # Changes in this version
 

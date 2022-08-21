@@ -43,10 +43,9 @@ try:    # main try statement for handling:
 
     # Python program to to edit Enless Sky (https://endless-sky.github.io/) save files
 
-    VERSION = "0.1"         # Version
+    VERSION = "0.2.0"         # Version
     VERSION_CHANGELOG = '''
-        Added help message.
-        Added more error handling.
+        Added command 'edit'
     '''                     # Changes in this version
 
     from termcolor import colored   # For colored text
@@ -90,14 +89,14 @@ Endless Sky Save Editor v{VERSION}:
         Enter the path to the save file you wish to edit.
             (save files are located in C:\\Users\\[YOUR USERNAME]\\AppData\\Roaming\\endless-sky\\saves)
         The program will print out a list of all the properties of the save file in the format of '{color.Fore.GREEN}[0]{color.Fore.WHITE} collapsed outfitter'
-        Then the program will ask for the element you want to edit.
+        Then the program will ask for a command.
             This will be the number in green.
         After you enter the number, the program will print a more detailed version of the element in the format of '{color.Fore.GREEN}[1]{color.Fore.WHITE}     Ammunition'
         Then the program will ask for the sub-element you want to edit.
             This will be the number in green.
         The program will ask for the new value, while providing the old one, eg: '{color.Fore.GREEN}[1]{color.Fore.WHITE} Previously: Ammunition. Enter new value (leave blank to cancel): '
         You can repeat changing values untill you wish to save.
-            To save, 
+            To save, enter 'save'.
 '''
         print(helpMessage)
 
@@ -116,18 +115,21 @@ Endless Sky Save Editor v{VERSION}:
 
     def printSelectedItem(index:int):
         '''Prints details about the selected item.'''
-        index1 = 0
-        item = items[index]
-        if type(item) == list:
-            for item_ in item:
-                if type(item_) == list:
-                    print(colored(f"[{index1}]", 'green'), item_[index1].replace('\\t', '\t').replace('"', ''))
-                elif type(item_) == str:
-                    print(colored(f"[{index1}]", 'green'), item_.replace('\\t', '\t').replace('"', ''))
-                index1 += 1
-        elif type(item) == str:
-            print(colored(f"[{index}]", 'green'), item.replace('\\t', '\t').replace('"', ''))
-    
+        try:
+            index1 = 0
+            item = items[index]
+            if type(item) == list:
+                for item_ in item:
+                    if type(item_) == list:
+                        print(colored(f"[{index1}]", 'green'), item_[index1].replace('\\t', '\t').replace('"', ''))
+                    elif type(item_) == str:
+                        print(colored(f"[{index1}]", 'green'), item_.replace('\\t', '\t').replace('"', ''))
+                    index1 += 1
+            elif type(item) == str:
+                print(colored(f"[{index}]", 'green'), item.replace('\\t', '\t').replace('"', ''))
+        except TypeError:
+            pass
+
     trying = True
     while trying:   # Loops untill response is 'exit' or a valid filepath
         filename = input("File path to save file (check in %appdata%/roaming/endless-sky/saves): ") # Asks runner for file to open
@@ -175,12 +177,19 @@ Endless Sky Save Editor v{VERSION}:
             
 
     while True: # Item edit loop
+        command = False
         trying = True
+
         while trying:
             try:
-                itemIndex = input("Enter an item to edit\n\t('save' to save, 'exit' to exit, and '?' or 'help' to print help text): ") # get an item to edit
-                itemIndex = int(itemIndex)                                             # and convert to int
-                trying = False # If there are no errors, continue
+                if not command:
+                    itemIndex = input("Enter an command\n\t('save' to save, 'exit' to exit, and '?' or 'help' to print help text): ") # get an item to edit
+                    itemIndex = int(itemIndex)                                                                                        # and convert to int
+                    
+                    trying = False # If there are no errors, continue
+
+                command = False
+
                 printSelectedItem(itemIndex) # Print details about the selected item
 
                 itemToEdit = items[itemIndex]
@@ -248,12 +257,23 @@ Endless Sky Save Editor v{VERSION}:
                             continue
                     quit()
 
+                elif itemIndex.lower().strip().startswith('edit'): # check if input is 'edit'
+                    command = True
+                    itemIndex = itemIndex.lower().replace('edit', '').strip()
+                    try:
+                        itemIndex = int(itemIndex)
+                    except ValueError:
+                        print(colored('Usage: edit [number of item to edit]', 'red'))
+                    continue
+
                 elif itemIndex.lower().strip() == '?' or itemIndex.lower().strip() == 'help': # check if input is 'help' or '?'
                     printHelpMessage()
                     continue
 
                 # itemIndex = int(input("Enter a valid indeger of an item to edit: "))
-                print('Invalid item.')
+                print(f'Invalid item: {itemIndex}.')
+            # except TypeError:
+            #     print(colored('Invalid command.', 'red'))
 
 except KeyboardInterrupt: # ctrl + c
     try: # confirm exit

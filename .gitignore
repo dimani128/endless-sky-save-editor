@@ -3,4 +3,7 @@ testSave.txt
 .vscode
 falseSave.txt
 __pycache__/
-*.zip
+Source/
+dist/
+build/
+*.spec

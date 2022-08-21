@@ -15,6 +15,7 @@
 # Some colored text is broken:
 #   quit message
 #   edit sub-item
+#   unsaved changes message
 
 
 try:    # main try statement for handling:

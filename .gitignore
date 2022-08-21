@@ -3,3 +3,4 @@ testSave.txt
 .vscode
 falseSave.txt
 __pycache__/
+*.zip

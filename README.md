@@ -6,3 +6,10 @@ A WIP save editor for the videogame [Endless Sky](https://endless-sky.github.io/
 2. Open your preffered command line to the folder with 'main.py'
 3. Run ```pip3 install -r requirements.txt```
 4. Run ```python3 main.py```
+
+## Changelog
+#### v0.1 - 8/21/2022:
+ - Added ```help``` command
+ - Added save fuctionality
+#### v0.0 - 8/20/2022:
+ - Initial Release

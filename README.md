@@ -1,5 +1,5 @@
 # endless-sky-save-editor
-A WIP save editor for the videogame [Endless Sky](https://endless-sky.github.io/)
+A WIP save editor for the videogame [Endless Sky](https://endless-sky.github.io/) made in python 3.10.
 
 ## Installation
 1. Download and extract the code (via .zip file or git clone)

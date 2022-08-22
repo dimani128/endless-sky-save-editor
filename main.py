@@ -8,9 +8,6 @@
 #   paste [number]
 #   edit [number]
 
-# DONE
-# Add comments to explain code
-
 # BUG(s)
 # No known bugs right now
 

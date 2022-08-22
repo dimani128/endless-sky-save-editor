@@ -12,11 +12,7 @@
 # Add comments to explain code
 
 # BUG(s)
-# Some colored text is broken:
-#   quit message
-#   edit sub-item
-#   unsaved changes message
-
+# No known bugs right now
 
 try:    # main try statement for handling:
         #   - SystemExit

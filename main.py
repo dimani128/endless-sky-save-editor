@@ -43,10 +43,9 @@ try:    # main try statement for handling:
 
     # Python program to to edit Enless Sky (https://endless-sky.github.io/) save files
 
-    VERSION = "0.2.0"         # Version
+    VERSION = "0.2.1"         # Version
     VERSION_CHANGELOG = '''
-        Added patch number to version
-        Added command 'edit'
+    Fixed ''Are you sure you want to quit (y/n)?' exits no matter your response' bug.
     '''                     # Changes in this version
 
     from termcolor import colored   # For colored text
@@ -254,9 +253,10 @@ Endless Sky Save Editor v{VERSION}:
                         # confirm exit without save
                         confirm = input(colored(f"You have made unsaved changes. \n\tAre you sure you want to exit (y/n)? ", 'yellow'))
                         confirm = confirm.strip().lower()
-                        if not (confirm == 'y' or confirm == 'yes'):
-                            continue
-                    quit()
+                        if confirm == 'y' or confirm == 'yes':
+                            quit()
+                    else:
+                        quit()
 
                 elif itemIndex.lower().strip().startswith('edit'): # check if input is 'edit'
                     command = True

@@ -37,8 +37,8 @@ try:    # main try statement for handling:
 
     VERSION = "0.2.3"         # Version
     VERSION_CHANGELOG = '''
-    Prints new version of save file after edits.
-    Fixed 'Getting AttributeError: 'int' object has no attribute 'lower' when entering exit in the Enter a sub-item to edit prompt' (#5)
+    Fixed 'Are you sure you want to exit (y/n)?Are you sure you want to exit (y/n)?' prompt saying 'invalid item: exit'
+    Fixel del command not working on sub-items.
     '''                     # Changes in this version
 
     from termcolor import colored   # For colored text
@@ -183,6 +183,8 @@ Endless Sky Save Editor v{VERSION}:
                     itemIndex = input("Enter an command\n\t('save' to save, 'exit' to exit, and '?' or 'help' to print help text): ") # get an item to edit
                     itemIndex = int(itemIndex)                                                                                        # and convert to int
                     
+                prevItemIndex = itemIndex
+
                 trying = False # If there are no errors, continue
 
                 command = False
@@ -265,6 +267,8 @@ Endless Sky Save Editor v{VERSION}:
                             confirm = confirm.strip().lower()
                             if confirm == 'y' or confirm == 'yes':
                                 quit()
+                            else:
+                                continue
                         else:
                             quit()
 
@@ -280,6 +284,17 @@ Endless Sky Save Editor v{VERSION}:
                     elif itemIndex.lower().strip() == '?' or itemIndex.lower().strip() == 'help': # check if input is 'help' or '?'
                         printHelpMessage()
                         continue
+
+                    elif itemIndex.lower().strip().startswith('del') or itemIndex.lower().strip().startswith('delete'): # check if input is 'delete' or 'del'
+                        try:
+                            del items[int(itemIndex.replace('del ', '').replace('delete ', ''))]
+                        except IndexError:
+                            print(colored('Invalid item number', 'red'))
+                    
+                        changed = True
+                        continue
+
+
                 except AttributeError:
                     try:
                         if subItemIndex.lower().strip() == 'save': # check if input is 'save'
@@ -334,12 +349,28 @@ Endless Sky Save Editor v{VERSION}:
                                 confirm = confirm.strip().lower()
                                 if confirm == 'y' or confirm == 'yes':
                                     quit()
+                                else:
+                                    continue
                             else:
                                 quit()
 
                         elif subItemIndex.lower().strip() == '?' or subItemIndex.lower().strip() == 'help': # check if input is 'help' or '?'
                             printHelpMessage()
                             continue
+                        elif subItemIndex.lower().strip().startswith('del') or subItemIndex.lower().strip().startswith('delete'): # check if input is 'delete' or 'del'
+                            # print('hello')
+                            try:
+                                del items[prevItemIndex][int(subItemIndex.replace('del ', '').replace('delete ', ''))]
+                            except IndexError:
+                                print(colored('Invalid item number', 'red'))
+                            except BaseException as e: # unhandled error
+                                print(color.Fore.RED + f"\n\nFATAL ERROR DETECTED!\n Please report this error to https://github.com/newDan1/endless-sky-save-editor/issues:\n{full_stack()}\n\n")
+                                quit()
+
+                            changed = True
+                            
+                            continue
+
                     except AttributeError:
                         pass
 

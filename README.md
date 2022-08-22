@@ -9,5 +9,10 @@ A WIP save editor for the videogame [Endless Sky](https://endless-sky.github.io/
 
 ## Changelog
 Changelog is now in [CHANGELOG.md](CHANGELOG.md)
-## Roadmap
-Changelog is now in [ROADMAP.md](ROADMAP.md)
+## Planned Features/Additions
+ * Implement commands:
+   * del (delete)
+   * add
+   * copy
+   * paste
+   * edit

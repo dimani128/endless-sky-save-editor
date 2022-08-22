@@ -6,7 +6,6 @@
 #   add [number] [value]
 #   copy [number]
 #   paste [number]
-#   edit [number]
 
 # BUG(s)
 # No known bugs right now
@@ -36,9 +35,10 @@ try:    # main try statement for handling:
 
     # Python program to to edit Enless Sky (https://endless-sky.github.io/) save files
 
-    VERSION = "0.2.2"         # Version
+    VERSION = "0.2.3"         # Version
     VERSION_CHANGELOG = '''
-    Fixed ''Some ANSI color codes are broken' bug.
+    Prints new version of save file after edits.
+    Fixed 'Getting AttributeError: 'int' object has no attribute 'lower' when entering exit in the Enter a sub-item to edit prompt' (#5)
     '''                     # Changes in this version
 
     from termcolor import colored   # For colored text
@@ -94,10 +94,13 @@ Endless Sky Save Editor v{VERSION}:
         print(helpMessage)
 
     index = 0
+    subItemIndex = 0
+    changed = False
 
     def printAvailableItems():
         '''Prints list of items in the opened save file.'''
         global index
+        index = 0
         for item in items:
             if type(item) == list:
                 print(colored(f"[{index}]", 'green'), item[0].replace('\\t', '\t').replace('"', ''))
@@ -151,7 +154,6 @@ Endless Sky Save Editor v{VERSION}:
                         else:
                             continue
                     items = splitByIndentation(f.read()) # split the file by indentation
-                    printAvailableItems()                # print save file items
                 except (IndexError, UnicodeDecodeError): # IndexError: Empty file, UnicodeDecodeError: Non-text file
                     print(colored(f"The file '{filename}' is not a valid Endless Sky save file. Please choose a valid Endless Sky save file.", 'red'))
                     continue
@@ -176,97 +178,170 @@ Endless Sky Save Editor v{VERSION}:
 
         while trying:
             try:
+                printAvailableItems()                # print save file items
                 if not command:
                     itemIndex = input("Enter an command\n\t('save' to save, 'exit' to exit, and '?' or 'help' to print help text): ") # get an item to edit
                     itemIndex = int(itemIndex)                                                                                        # and convert to int
                     
-                    trying = False # If there are no errors, continue
+                trying = False # If there are no errors, continue
 
                 command = False
-
-                printSelectedItem(itemIndex) # Print details about the selected item
-
-                itemToEdit = items[itemIndex]
-
-                subItemIndex = int(input("Enter a sub-item to edit: ")) # Ask user for sub-item to edit
                 
-                oldVal = itemToEdit[subItemIndex]
+                printSelectedItem(itemIndex) # Print details about the selected item
+                itemToEdit = items[itemIndex]
+                
+                trying = True
 
-                # Ask for new value
-                print(colored(f'[{subItemIndex}]', 'green'), end='')
-                newVal = "\t" + input(f'Previously: {oldVal.strip()}. Enter new value (leave blank to cancel): ').strip()
-                if newVal: # check if not blank
-                    items[itemIndex][subItemIndex] = newVal # set new value
-                    changed = True # mark as changed
+                while trying:
+                    subItemIndex = input("Enter a sub-item to edit: ") # Ask user for sub-item to edit
+
+                    if not subItemIndex:
+                        continue
+
+                    subItemIndex_ = int(subItemIndex)
+                
+                    oldVal = itemToEdit[subItemIndex_]
+
+                    # Ask for new value
+                    print(colored(f'[{subItemIndex_}]', 'green'), end='')
+                    newVal = "\t" + input(f'Previously: {oldVal.strip()}. Enter new value (leave blank to cancel): ').strip()
+                    if newVal: # check if not blank
+                        items[itemIndex][subItemIndex_] = newVal # set new value
+                        changed = True # mark as changed
+                    
+                    trying = False
                 
             except (ValueError, IndexError): # input is not integer or is not inside item bounds
-                if itemIndex.lower().strip() == 'save': # check if input is 'save'
-                    savedFile = ""
-                    for item in items:
-                        # append each element to the save file
-                        if type(item) == list:
-                            for item_ in item:
-                                savedFile += item_
-                                savedFile += '\n'
+                try:
+                    if itemIndex.lower().strip() == 'save': # check if input is 'save'
+                        savedFile = ""
+                        for item in items:
+                            # append each element to the save file
+                            if type(item) == list:
+                                for item_ in item:
+                                    savedFile += item_
+                                    savedFile += '\n'
 
-                        elif type(item) == str:
-                            savedFile += item
+                            elif type(item) == str:
+                                savedFile += item
 
-                        savedFile += '\n'
-                    
-                    # print('\n\n\n' + savedFile)
+                            savedFile += '\n'
+                        
+                        # print('\n\n\n' + savedFile)
 
-                    trying = True
-                    while trying:
-                        # get save path
-                        filename = input("File path to save in: ")
-                        filename = filename.strip()
-                        try:
-                            if filename == '':
-                                raise EmptyStringError
-                            else:
-                                try:
-                                    with open(filename, 'w') as f: # if succeeds, file already exists
-                                        # confirm override
-                                        print(color.Fore.YELLOW + f"{os.path.basename(filename)} already exists. Are you sure you want to overwrite it (y/n)? " + color.Fore.WHITE)
-                                        end = input('')
-                                        end = end.strip().lower()
-                                        if end == 'y' or end == 'yes':
+                        trying = True
+                        while trying:
+                            # get save path
+                            filename = input("File path to save in: ")
+                            filename = filename.strip()
+                            try:
+                                if filename == '':
+                                    raise EmptyStringError
+                                else:
+                                    try:
+                                        with open(filename, 'w') as f: # if succeeds, file already exists
+                                            # confirm override
+                                            print(color.Fore.YELLOW + f"{os.path.basename(filename)} already exists. Are you sure you want to overwrite it (y/n)? " + color.Fore.WHITE)
+                                            end = input('')
+                                            end = end.strip().lower()
+                                            if end == 'y' or end == 'yes':
+                                                f.write(savedFile)
+                                                trying = False
+                                    except FileNotFoundError: # file doesn't exist
+                                        with open(filename, 'x') as f: # create and write to new file
                                             f.write(savedFile)
                                             trying = False
-                                except FileNotFoundError: # file doesn't exist
-                                    with open(filename, 'x') as f: # create and write to new file
-                                        f.write(savedFile)
-                                        trying = False
-                        except EmptyStringError:
-                            print("You must enter a value.")
+                            except EmptyStringError:
+                                print("You must enter a value.")
 
-                    # quit()
-                    changed = False
+                        # quit()
+                        changed = False
 
-                elif itemIndex.lower().strip() == 'exit': # check if input is 'exit'
-                    if changed: # user has made changes
-                        # confirm exit without save
-                        print(colored(f"You have made unsaved changes. \n\tAre you sure you want to exit (y/n)? ", 'yellow'), end='')
-                        confirm = input('')
-                        confirm = confirm.strip().lower()
-                        if confirm == 'y' or confirm == 'yes':
+                    elif itemIndex.lower().strip() == 'exit': # check if input is 'exit'
+                        if changed: # user has made changes
+                            # confirm exit without save
+                            print(colored(f"You have made unsaved changes. \n\tAre you sure you want to exit (y/n)? ", 'yellow'), end='')
+                            confirm = input('')
+                            confirm = confirm.strip().lower()
+                            if confirm == 'y' or confirm == 'yes':
+                                quit()
+                        else:
                             quit()
-                    else:
-                        quit()
 
-                elif itemIndex.lower().strip().startswith('edit'): # check if input is 'edit'
-                    command = True
-                    itemIndex = itemIndex.lower().replace('edit', '').strip()
+                    elif itemIndex.lower().strip().startswith('edit'): # check if input is 'edit'
+                        command = True
+                        itemIndex = itemIndex.lower().replace('edit', '').strip()
+                        try:
+                            itemIndex = int(itemIndex)
+                        except ValueError:
+                            print(colored('Usage: edit [number of item to edit]', 'red'))
+                        continue
+
+                    elif itemIndex.lower().strip() == '?' or itemIndex.lower().strip() == 'help': # check if input is 'help' or '?'
+                        printHelpMessage()
+                        continue
+                except AttributeError:
                     try:
-                        itemIndex = int(itemIndex)
-                    except ValueError:
-                        print(colored('Usage: edit [number of item to edit]', 'red'))
-                    continue
+                        if subItemIndex.lower().strip() == 'save': # check if input is 'save'
+                            savedFile = ""
+                            for item in items:
+                                # append each element to the save file
+                                if type(item) == list:
+                                    for item_ in item:
+                                        savedFile += item_
+                                        savedFile += '\n'
 
-                elif itemIndex.lower().strip() == '?' or itemIndex.lower().strip() == 'help': # check if input is 'help' or '?'
-                    printHelpMessage()
-                    continue
+                                elif type(item) == str:
+                                    savedFile += item
+
+                                savedFile += '\n'
+                            
+                            # print('\n\n\n' + savedFile)
+
+                            trying = True
+                            while trying:
+                                # get save path
+                                filename = input("File path to save in: ")
+                                filename = filename.strip()
+                                try:
+                                    if filename == '':
+                                        raise EmptyStringError
+                                    else:
+                                        try:
+                                            with open(filename, 'w') as f: # if succeeds, file already exists
+                                                # confirm override
+                                                print(color.Fore.YELLOW + f"{os.path.basename(filename)} already exists. Are you sure you want to overwrite it (y/n)? " + color.Fore.WHITE)
+                                                end = input('')
+                                                end = end.strip().lower()
+                                                if end == 'y' or end == 'yes':
+                                                    f.write(savedFile)
+                                                    trying = False
+                                        except FileNotFoundError: # file doesn't exist
+                                            with open(filename, 'x') as f: # create and write to new file
+                                                f.write(savedFile)
+                                                trying = False
+                                except EmptyStringError:
+                                    print("You must enter a value.")
+
+                            # quit()
+                            changed = False
+
+                        elif subItemIndex.lower().strip() == 'exit': # check if input is 'exit'
+                            if changed: # user has made changes
+                                # confirm exit without save
+                                print(colored(f"You have made unsaved changes. \n\tAre you sure you want to exit (y/n)? ", 'yellow'), end='')
+                                confirm = input('')
+                                confirm = confirm.strip().lower()
+                                if confirm == 'y' or confirm == 'yes':
+                                    quit()
+                            else:
+                                quit()
+
+                        elif subItemIndex.lower().strip() == '?' or subItemIndex.lower().strip() == 'help': # check if input is 'help' or '?'
+                            printHelpMessage()
+                            continue
+                    except AttributeError:
+                        pass
 
                 # itemIndex = int(input("Enter a valid indeger of an item to edit: "))
                 print(f'Invalid item: {itemIndex}.')

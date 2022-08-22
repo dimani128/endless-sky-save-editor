@@ -8,6 +8,8 @@ A WIP save editor for the videogame [Endless Sky](https://endless-sky.github.io/
 4. Run ```python3 main.py```
 
 ## Changelog
+### v0.2.2 - 8/21/2022
+ * [Fixed ''Some ANSI color codes are broken' bug.](https://github.com/newDan1/endless-sky-save-editor/issues/3)
 ### v0.2.1 - 8/21/2022
  * Fixed ```'Are you sure you want to quit (y/n)?' exits no matter your response is``` bug.
 ### v0.2.0 - 8/21/2022:

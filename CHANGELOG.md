@@ -4,7 +4,7 @@
 ### v0.2.1 - 8/21/2022
  * Fixed ```'Are you sure you want to quit (y/n)?' exits no matter your response is``` bug.
 ### v0.2.0 - 8/21/2022:
- - Added patch number to version
+ - Added patch number to version number
  - Added 'edit' command
 ### v0.1 - 8/21/2022:
  - Added ```help``` command

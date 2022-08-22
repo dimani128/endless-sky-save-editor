@@ -35,7 +35,7 @@ try:    # main try statement for handling:
 
     # Python program to to edit Enless Sky (https://endless-sky.github.io/) save files
 
-    VERSION = "0.2.3"         # Version
+    VERSION = "0.2.4"         # Version
     VERSION_CHANGELOG = '''
     Fixed 'Are you sure you want to exit (y/n)?Are you sure you want to exit (y/n)?' prompt saying 'invalid item: exit'
     Fixel del command not working on sub-items.

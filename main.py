@@ -43,9 +43,9 @@ try:    # main try statement for handling:
 
     # Python program to to edit Enless Sky (https://endless-sky.github.io/) save files
 
-    VERSION = "0.2.1"         # Version
+    VERSION = "0.2.2"         # Version
     VERSION_CHANGELOG = '''
-    Fixed ''Are you sure you want to quit (y/n)?' exits no matter your response' bug.
+    Fixed ''Some ANSI color codes are broken' bug.
     '''                     # Changes in this version
 
     from termcolor import colored   # For colored text
@@ -150,7 +150,8 @@ Endless Sky Save Editor v{VERSION}:
             with open(filename, 'r') as f: # open the file
                 try:
                     if not filename.lower().strip().endswith(".txt"): # check if ends in .txt
-                        confirm = input(colored(f"{filename} does not end with the Endless Sky save file format (.txt). \n\tAre you sure you want to continue (y/n)? ", 'yellow'))
+                        print(colored(f"{filename} does not end with the Endless Sky save file format (.txt). \n\tAre you sure you want to continue (y/n)? ", 'yellow'), end='')
+                        confirm = input('')
                         confirm = confirm.strip().lower()
                         if confirm == 'y' or confirm == 'yes':
                             pass
@@ -165,7 +166,7 @@ Endless Sky Save Editor v{VERSION}:
         except FileNotFoundError: # File doesn't exist
             print(color.Fore.YELLOW + f"The file {filename} was not found.\n Check you spelling and see if the file exists." + color.Fore.WHITE)
         except InvalidFilenameError: # Invalid filename
-            print('Invalid filename.')
+            print(colored('Invalid filename.', 'red'))
         except OSError as e: # OSerror: could be many things
             try:
                 if "Invalid argument:" in str(e): # Check if error is 'OSError: [Errno 22] Invalid argument: ...'
@@ -173,7 +174,7 @@ Endless Sky Save Editor v{VERSION}:
                 else:
                     raise e                       # Re-raise OSError
             except InvalidFilenameError: # Invalid filename
-                print('Invalid filename.')
+                print(colored('Invalid filename.', 'red'))
             
 
     while True: # Item edit loop
@@ -199,7 +200,8 @@ Endless Sky Save Editor v{VERSION}:
                 oldVal = itemToEdit[subItemIndex]
 
                 # Ask for new value
-                newVal = "\t" + input(colored(f'[{subItemIndex}]', 'green') + f'Previously: {oldVal.strip()}. Enter new value (leave blank to cancel): ').strip()
+                print(colored(f'[{subItemIndex}]', 'green'), end='')
+                newVal = "\t" + input(f'Previously: {oldVal.strip()}. Enter new value (leave blank to cancel): ').strip()
                 if newVal: # check if not blank
                     items[itemIndex][subItemIndex] = newVal # set new value
                     changed = True # mark as changed
@@ -233,7 +235,8 @@ Endless Sky Save Editor v{VERSION}:
                                 try:
                                     with open(filename, 'w') as f: # if succeeds, file already exists
                                         # confirm override
-                                        end = input(color.Fore.YELLOW + f"{os.path.basename(filename)} already exists. Are you sure you want to overwrite it (y/n)? " + color.Fore.WHITE)
+                                        print(color.Fore.YELLOW + f"{os.path.basename(filename)} already exists. Are you sure you want to overwrite it (y/n)? " + color.Fore.WHITE)
+                                        end = input('')
                                         end = end.strip().lower()
                                         if end == 'y' or end == 'yes':
                                             f.write(savedFile)
@@ -251,7 +254,8 @@ Endless Sky Save Editor v{VERSION}:
                 elif itemIndex.lower().strip() == 'exit': # check if input is 'exit'
                     if changed: # user has made changes
                         # confirm exit without save
-                        confirm = input(colored(f"You have made unsaved changes. \n\tAre you sure you want to exit (y/n)? ", 'yellow'))
+                        print(colored(f"You have made unsaved changes. \n\tAre you sure you want to exit (y/n)? ", 'yellow'), end='')
+                        confirm = input('')
                         confirm = confirm.strip().lower()
                         if confirm == 'y' or confirm == 'yes':
                             quit()
@@ -281,8 +285,8 @@ except KeyboardInterrupt: # ctrl + c
         from termcolor import colored
         import colorama as color
         color.reinit()
-        print()
-        end = input(f"{color.Fore.RED}Are you sure you want to quit (y/n)? {color.Fore.WHITE}")
+        print(f'\n{color.Fore.RED}Are you sure you want to quit (y/n)? {color.Fore.WHITE}', end='')
+        end = input('')
         end = end.strip().lower()
         if end == 'y' or end == 'yes':
             quit()
@@ -290,6 +294,9 @@ except KeyboardInterrupt: # ctrl + c
         #     pass
     except KeyboardInterrupt as e: # ctrl + c when confirming exit
         quit()
+    except SystemExit as e: # raised by quit()
+        import sys
+        sys.exit(e) # exits silently
     except BaseException as e: # unhandled error
         print(color.Fore.RED + f"\n\nFATAL ERROR DETECTED!\n Please report this error to https://github.com/newDan1/endless-sky-save-editor/issues:\n{full_stack()}\n\n")
         quit()

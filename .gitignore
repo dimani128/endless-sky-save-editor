@@ -1,9 +1,6 @@
-save.txt
-testSave.txt
-.vscode
-falseSave.txt
-__pycache__/
-Source/
-dist/
-build/
-*.spec
+*
+
+!*.md
+!*.py
+!requirements.txt
+!.gitignore

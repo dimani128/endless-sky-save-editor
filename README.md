@@ -22,6 +22,8 @@ Latest: https://github.com/newDan1/endless-sky-save-editor/releases<br>
 
 ## Changelog
 #### Changelog is also in [CHANGELOG.md](CHANGELOG.md)
+### v0.2.6
+ * Added commands: copy, paste, and add.
 ### v0.2.5
  * Changed file select to tk.filedialogue.
  * Added clear command.

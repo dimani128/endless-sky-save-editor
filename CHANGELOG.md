@@ -1,4 +1,6 @@
 ## Changelog
+### v0.2.6
+ * Added commands: copy, paste, and add.
 ### v0.2.5
  * Changed file select to tk.filedialogue.
  * Added clear command.

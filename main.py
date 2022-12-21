@@ -39,10 +39,9 @@ try:    # main try statement for handling:
 
     # Python program to to edit Enless Sky (https://endless-sky.github.io/) save files
 
-    VERSION = "0.2.5"         # Version
+    VERSION = "0.2.6"         # Version
     VERSION_CHANGELOG = '''
-    Changed file select to tk.filedialogue.
-    Added clear command.
+    Added commands: copy, paste, and add.
     '''                     # Changes in this version
 
     from termcolor import colored   # For colored text
@@ -50,6 +49,8 @@ try:    # main try statement for handling:
     color.init()                    # Initialize colorama
 
     import os                       # File operations
+
+    copiedLine = ''
 
     def cls():
         """Clears the console."""
@@ -192,7 +193,7 @@ Endless Sky Save Editor v{VERSION}:
             try:
                 printAvailableItems()                # print save file items
                 if not command:
-                    itemIndex = input("Enter an command or an id of an item:\n\t('save' to save, 'exit' to exit, 'clear' to clear the screen, or '?' or 'help' to print help text): ")
+                    itemIndex = input("Enter an command or an id of an item:\n\t('save' to save, 'copy' to copy a line, 'paste' to paste the copied line below a line, 'add' to add a new line, 'exit' to exit, 'clear' to clear the screen, or '?' or 'help' to print help text): ")
                                                         # /\ /\ get an item to edit
                     itemIndex = int(itemIndex)          # and convert to int
                     
@@ -371,6 +372,43 @@ Endless Sky Save Editor v{VERSION}:
                                     continue
                             else:
                                 quit()
+
+                        elif subItemIndex.lower().strip() == 'copy': # check if input is 'exit'
+                            _trying = True
+                            while _trying:
+                                try:
+                                    line = int(input("Please select a line to copy: "))
+                                except ValueError:
+                                    print(colored('Please input a valid line number.', 'red'))
+                                if line < len(items):
+                                    copiedLine = items[itemIndex][line]
+                                    _trying = False
+                            continue
+
+                        elif subItemIndex.lower().strip() == 'paste': # check if input is 'exit'
+                            _trying = True
+                            while _trying:
+                                try:
+                                    line = int(input("Please select a line to paste the copied line below: "))
+                                except ValueError:
+                                    print(colored('Please input a valid line number.', 'red'))
+                                if line < len(items):
+                                    items[itemIndex].insert(line + 1, copiedLine)
+                                    _trying = False
+                            continue
+
+                        elif subItemIndex.lower().strip() == 'add': # check if input is 'exit'
+                            _trying = True
+                            while _trying:
+                                try:
+                                    line = int(input("Please select a line to add a new one after: "))
+                                except ValueError:
+                                    print(colored('Please input a valid line number.', 'red'))
+                                if line < len(items):
+                                    text = input('Please enter new line data:\n')
+                                    items[itemIndex].insert(line + 1, text)
+                                    _trying = False
+                            continue
 
                         elif subItemIndex.lower().strip() == '?' or subItemIndex.lower().strip() == 'help': # check if input is 'help' or '?'
                             printHelpMessage()

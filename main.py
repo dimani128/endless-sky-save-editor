@@ -15,9 +15,12 @@ try:    # main try statement for handling:
         #   - KeyboardInterrupt
         #   - Other unhandled exceptions
 
+    from tkinter import filedialog as tkfd
+    from tkinter import messagebox as tkmsg
+    
     from errors import EmptyStringError, InvalidFilenameError
 
-    # Unnescesarry b/c all refremces have import beforehand. Saves loading time.
+    # Unnescesarry b/c all refrences have import beforehand. Saves loading time.
     # import sys # for sys.exit() and getting stacktrace
 
     def full_stack(): # returns last stacktrace (error)
@@ -35,10 +38,10 @@ try:    # main try statement for handling:
 
     # Python program to to edit Enless Sky (https://endless-sky.github.io/) save files
 
-    VERSION = "0.2.3"         # Version
+    VERSION = "0.2.5"         # Version
     VERSION_CHANGELOG = '''
-    Fixed 'Are you sure you want to exit (y/n)?Are you sure you want to exit (y/n)?' prompt saying 'invalid item: exit'
-    Fixel del command not working on sub-items.
+    Changed file select to tk.filedialogue.
+    Added clear command.
     '''                     # Changes in this version
 
     from termcolor import colored   # For colored text
@@ -46,6 +49,11 @@ try:    # main try statement for handling:
     color.init()                    # Initialize colorama
 
     import os                       # File operations
+
+    def cls():
+        """Clears the console."""
+        os.system('cls' if os.name=='nt' else 'clear')
+
     from pathlib import Path        # Checking if path is valid
 
     def splitByIndentation(data: str):
@@ -128,8 +136,11 @@ Endless Sky Save Editor v{VERSION}:
 
     trying = True
     while trying:   # Loops untill response is 'exit' or a valid filepath
-        filename = input("File path to save file (check in %appdata%/roaming/endless-sky/saves): ") # Asks runner for file to open
-        filename = filename.strip('"') # remove double quotes on ends (file explorer 'copy as path' adds quotes to ends)
+        # filename = input("File path to save file (check in %appdata%\\endless-sky\\saves): ") # Asks runner for file to open
+        filename = tkfd.askopenfilename(initialdir = os.environ["appdata"] + '\\endless-sky\\saves', title= "Please select a file:", filetypes=(('Endless Sky Save Files', '*.txt'),('All files', '*.*'),))
+
+        filename = filename.strip('"\'') # remove quotes on ends (file explorer 'copy as path' adds double quotes to ends)
+
         if not filename: # check if path is blank
             continue
         elif filename.lower().strip() == 'exit': # check if path is 'exit'
@@ -180,8 +191,9 @@ Endless Sky Save Editor v{VERSION}:
             try:
                 printAvailableItems()                # print save file items
                 if not command:
-                    itemIndex = input("Enter an command\n\t('save' to save, 'exit' to exit, and '?' or 'help' to print help text): ") # get an item to edit
-                    itemIndex = int(itemIndex)                                                                                        # and convert to int
+                    itemIndex = input("Enter an command or an id of an item:\n\t('save' to save, 'exit' to exit, 'clear' to clear the screen, or '?' or 'help' to print help text): ")
+                                                        # /\ /\ get an item to edit
+                    itemIndex = int(itemIndex)          # and convert to int
                     
                 prevItemIndex = itemIndex
 
@@ -206,7 +218,8 @@ Endless Sky Save Editor v{VERSION}:
 
                     # Ask for new value
                     print(colored(f'[{subItemIndex_}]', 'green'), end='')
-                    newVal = "\t" + input(f'Previously: {oldVal.strip()}. Enter new value (leave blank to cancel): ').strip()
+                    oldValFormmatted = oldVal.replace('\t', '', 1)
+                    newVal = "\t" + input(f'Previously: {oldValFormmatted}. Enter new value (leave blank to cancel): ')
                     if newVal: # check if not blank
                         items[itemIndex][subItemIndex_] = newVal # set new value
                         changed = True # mark as changed
@@ -234,25 +247,25 @@ Endless Sky Save Editor v{VERSION}:
                         trying = True
                         while trying:
                             # get save path
-                            filename = input("File path to save in: ")
-                            filename = filename.strip()
+                            saveFilename = input("File path to save in (press enter without entering any path to use the same path): ")
+                            saveFilename = saveFilename.strip("\"' ")
                             try:
-                                if filename == '':
-                                    raise EmptyStringError
-                                else:
-                                    try:
-                                        with open(filename, 'w') as f: # if succeeds, file already exists
-                                            # confirm override
-                                            print(color.Fore.YELLOW + f"{os.path.basename(filename)} already exists. Are you sure you want to overwrite it (y/n)? " + color.Fore.WHITE)
-                                            end = input('')
-                                            end = end.strip().lower()
-                                            if end == 'y' or end == 'yes':
-                                                f.write(savedFile)
-                                                trying = False
-                                    except FileNotFoundError: # file doesn't exist
-                                        with open(filename, 'x') as f: # create and write to new file
+                                if saveFilename == '':
+                                    saveFilename = filename
+                                
+                                try:
+                                    with open(saveFilename, 'w') as f: # if succeeds, file already exists
+                                        # confirm override
+                                        print(color.Fore.YELLOW + f"{os.path.basename(saveFilename)} already exists. Are you sure you want to overwrite it (y/n)? " + color.Fore.WHITE)
+                                        end = input('')
+                                        end = end.strip().lower()
+                                        if end == 'y' or end == 'yes':
                                             f.write(savedFile)
                                             trying = False
+                                except FileNotFoundError: # file doesn't exist
+                                    with open(saveFilename, 'x') as f: # create and write to new file
+                                        f.write(savedFile)
+                                        trying = False
                             except EmptyStringError:
                                 print("You must enter a value.")
 
@@ -271,6 +284,10 @@ Endless Sky Save Editor v{VERSION}:
                                 continue
                         else:
                             quit()
+
+                    elif itemIndex.lower().strip() == 'clear': # check if input is 'exit'
+                        cls()
+                        continue
 
                     elif itemIndex.lower().strip().startswith('edit'): # check if input is 'edit'
                         command = True
@@ -375,7 +392,7 @@ Endless Sky Save Editor v{VERSION}:
                         pass
 
                 # itemIndex = int(input("Enter a valid indeger of an item to edit: "))
-                print(f'Invalid item: {itemIndex}.')
+                print(colored(f'Invalid item: {itemIndex}.'), 'red')
             # except TypeError:
             #     print(colored('Invalid command.', 'red'))
 

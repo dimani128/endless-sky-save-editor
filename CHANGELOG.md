@@ -1,4 +1,7 @@
 ## Changelog
+### v0.2.3
+ * Bug fixes
+ * Added `del` command
 ### v0.2.2 - 8/21/2022
  * [Fixed `Some ANSI color codes are broken` bug.](https://github.com/newDan1/endless-sky-save-editor/issues/3)
 ### v0.2.1 - 8/21/2022

@@ -1,4 +1,7 @@
 ## Changelog
+### v0.2.5
+ * Changed file select to tk.filedialogue.
+ * Added clear command.
 ### v0.2.3
  * Bug fixes
  * Added `del` command
